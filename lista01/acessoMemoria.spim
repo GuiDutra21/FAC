@@ -1,0 +1,47 @@
+# .data 
+#     vetor: .word 10, 20, 30, 40, 50, 60, 70, 80 ,90, 100
+# .text
+# main:
+
+# la $s0,vetor #passa o vetor para o $s0
+
+li $v0,5    # leitura do i
+syscall
+
+move $t1,$v0    # $t1 = i
+
+li $v0,5    # leitura do j
+syscall
+
+move $t2,$v0    # $t2 = j
+
+li $v0,5    # leitura do N
+syscall
+
+move $t3,$v0    # $t3 = N
+
+li $t4,4    # copia o valor 4 para o $t4
+
+mul $t4,$t4,$t2     # multiplca o j por 4
+
+add $t6,$s0,$t4     # faz $t6 apontar para A[j]
+
+lw $t5, 0($t6)  # $t5 recebe o elemento A[j]
+
+add $t5,$t5,$t3     # faz a soma A[j] + N
+
+li $t4,4    # copia o valor 4 para o $t4
+
+mul $t4, $t4, $t1   # multiplca o i por 4
+
+add $t7, $s0,$t4    # faz o $t7 apontar para A[i]
+
+sw $t5, 0($t7)  # A[i] = $t5(A[j] + N)
+
+# move $a0,$t5 # move o resultado para o argumento do print
+
+# li $v0,1  # printa o resultado
+# syscall
+
+# li $v0,10 # encerra o programa
+# syscall

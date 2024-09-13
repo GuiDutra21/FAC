@@ -1,0 +1,207 @@
+# .data
+# quebraLinha: .asciiz "\n"
+# pri: .asciiz"primeiro depois: "
+# seg: .asciiz"\nsegundo depois: "
+# priA: .asciiz"primeiro antes: "
+# segA: .asciiz"\nsegundo antes: "
+
+# .text
+#     main:
+#         li $v0,5
+#         syscall
+#         move $a0, $v0
+#         move $s0, $v0
+        
+#         li $v0,5
+#         syscall
+#         move $a1, $v0
+#         move $s1, $v0
+
+#         jal multfac
+
+#         li $v0,1
+#         mflo $a0
+#         syscall
+
+#         li $v0, 4
+#         la $a0,quebraLinha
+#         syscall
+        
+#         li $v0,1
+#         mfhi $a0
+#         syscall
+
+#         li $v0, 4
+#         la $a0,quebraLinha
+#         syscall
+#         syscall
+
+#         # resultado real
+#         mult $s1,$s0
+#         li $v0,1
+#         mflo $a0
+#         syscall
+
+#         li $v0, 4
+#         la $a0,quebraLinha
+#         syscall
+        
+#         li $v0,1
+#         mfhi $a0
+#         syscall
+
+
+#         li$v0, 10
+#         syscall
+
+multfac:
+    # recebe os dois valores
+    move $t0, $a0 
+    move $t1, $a1
+
+    # registradores para verificar o sinal do resultado
+    # se o t0 for negativo então o t3 = 1
+    # se o t1 for negativo então o t4 = 1
+    li $t3, 0
+    li $t4, 0
+
+    verificaSinalPrimeiro:
+        # verifica o sinal do primeiro
+        slt $t2, $t0, $zero
+        beq $t2, $zero ,verificaSinalSegundo # se ele for positivo vai para a verificação do segundo
+
+        # se for negativo converte com complemento de 2
+        nor $t0, $t0, $zero
+        addi $t0, $t0, 1
+
+        #coloca o t3 como "true"
+        li $t3,1
+
+    verificaSinalSegundo:
+        # verifica o sinal do segundo
+        slt $t2, $t1, $zero
+        beq $t2, $zero, multiplicacao # se ele for positivo começa o processo de multiplicação
+        
+        # se for negativo converte com complemento de 2
+        nor $t1, $t1, $zero
+        addi $t1, $t1, 1
+        
+        # coloca como "true" o t4
+        li $t4,1
+
+    multiplicacao:
+
+    # li $v0, 4
+    # la $a0,pri
+    # syscall
+
+    # li $v0,1
+    # move $a0, $t0
+    # syscall
+
+    # li $v0, 4
+    # la $a0,seg
+    # syscall
+
+    # li $v0,1
+    # move $a0, $t1
+    # syscall
+
+        # registrador que representa P[64...32]
+        li $t5,0
+
+        # registrador que representa P[31...0]
+        move $t6, $t1
+
+        # contador do laco
+        li $t8, 32
+
+        laco:
+            beq $t8, $zero, fim
+
+            andi $t7, $t6, 1 # captura o bit LSB
+            beq $t7,$zero, continua
+            add $t5, $t5, $t0
+
+            continua:
+                # anda uma casa a direita e passa o LSB do t5 para o MSB do t6
+                andi $t7, $t5, 1 # captura o bit LSB
+                sll $t7, $t7, 31
+                srl $t5, $t5, 1 # anda o t5 e t6 uma casa para a direita
+                srl $t6, $t6, 1
+                or $t6, $t6, $t7
+
+                addi $t8, $t8, -1
+                j laco
+
+        fim:
+
+            # se o t4 e t3 tiverem valores diferetes tem que usar o complemnto de 2 nos resultados
+            xor $t4, $t4, $t3
+            bne $t4, $zero, converte 
+            j retorno
+
+            converte:
+                # converte com complemento de 2
+                nor $t5, $t5, $zero
+                #addi $t5, $t5, 1
+
+                # se for negativo converte com complemento de 2
+                nor $t6, $t6, $zero
+                addi $t6, $t6, 1
+
+            retorno:
+                mtlo $t6
+                mthi $t5
+                jr $ra
+
+            # prints de teste
+
+            # li $v0, 4
+            # la $a0,priA
+            # syscall
+
+            # li $v0,1
+            # move $a0, $t5
+            # syscall
+
+            # li $v0, 4
+            # la $a0,segA
+            # syscall
+
+            # li $v0,1
+            # move $a0, $t6
+            # syscall
+
+            # li $v0, 4
+            # la $a0,quebraLinha
+            # syscall
+            
+            # li $v0, 4
+            # la $a0,quebraLinha
+            # syscall
+
+            # prints de teste
+                # li $v0, 4
+                # la $a0,pri
+                # syscall
+
+                # li $v0,1
+                # move $a0, $t5
+                # syscall
+
+                # li $v0, 4
+                # la $a0,seg
+                # syscall
+
+                # li $v0,1
+                # move $a0, $t6
+                # syscall
+
+                # li $v0, 4
+                # la $a0,quebraLinha
+                # syscall
+               
+                # li $v0, 4
+                # la $a0,quebraLinha
+                # syscall

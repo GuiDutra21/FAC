@@ -1,0 +1,64 @@
+.data 
+ quebraLinha: .asciiz "\n"
+ over: .asciiz "overflow\n"
+.text
+main:
+    li $v0,5
+    syscall
+    move $t0, $v0 # le o primeiro inteiro 
+
+    li $v0,5
+    syscall
+    move $t1, $v0 # le o segundo inteiro 
+
+    li $v0,5
+    syscall
+    move $t2, $v0 # le o terceiro inteiro  
+
+    addu $t0, $t1, $t2 # addu não lança excessão
+
+    xor $t3, $t2, $t1 # se os sinais forem iguais, entao t3 > 0, caso contrário t3 < 0
+
+    # caso t3 > 0, t3 = 0
+    # caso t3 < 0, t3 = 1
+    slt $t3, $t3, $zero 
+
+    bne $t3, $zero, semOverflow # se t3 for igual a 1, isso indica que não teve overFlow
+
+    # Se o sinal dos operandos forem iguais e o do resultado diferente houve overflow
+
+    # verifica se o sinal do resultado é igual ao dos operandos
+    # caso sim, $t3 > 0, e caso não t3 < 0
+    xor $t3, $t0, $t1 
+
+    # caso t3 > 0, t3 = 0
+    # caso t3 < 0, t3 = 1
+    slt $t3, $t3, $zero 
+
+    bne $t3, $zero, overflow  # caso $t3 for igual a 1 isso indica que não teve overflow
+
+    j semOverflow
+
+    
+    semOverflow:
+        # printa o resultado e uma quebra de linha
+        li $v0, 1
+        move $a0, $t0
+        syscall
+        
+        li $v0, 4
+        la $a0, quebraLinha
+        syscall
+
+        j fim
+
+    overflow:
+        li $v0, 4
+        la $a0, over
+        syscall
+
+        j fim
+
+    fim:
+        li $v0,10
+        syscall

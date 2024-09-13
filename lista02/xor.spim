@@ -1,0 +1,56 @@
+.data 
+    msg1: .asciiz "1\n"
+    msg2: .asciiz "2\n"
+    str: .space 3
+    msg3: .asciiz ""
+.text
+main:
+
+    # le o interio e salva em t0
+    li $v0,5 
+    syscall
+    move $t0,$v0
+
+    # inicializa o contador
+    li $t4, 0
+
+    loop:
+
+        # verifica se a condicao do loop foi satisfeita ou nao, caso sim sai do loop e caso contrario permanece
+        slt $t1, $t4, $t0
+        beq $t1, $zero, encerra 
+
+        # le a string
+        li $v0,8
+        la $a0, str  # carrega a string em a0, deve ler somente 3 caracteres
+        syscall 
+
+        # passa os valores para t2 e t3
+        lb $t2, 0($a0)
+        lb $t3, 2($a0)
+
+        # compara se eh igual, se for igual imprime 1 e se for diferente imprime 2
+        beq $t2, $t3, printa1
+        j printa2
+
+        printa1:
+
+            li $v0, 4
+            la $a0, msg1
+            syscall
+            j continua
+        
+        printa2:
+
+            li $v0, 4
+            la $a0, msg2
+            syscall
+        
+        continua:
+            addi $t4, $t4, 1
+            j loop
+            
+
+encerra:
+    li $v0, 10
+    syscall

@@ -1,0 +1,24 @@
+.data
+
+.text
+main :
+    li $v0,5 # leituira do inteiro, resultado vai para $v0
+    syscall
+
+    move $t0,$v0 # move o resultado de $v0 para $t0 (que eh o priemiro elemento da subtracao)
+
+    li $v0,5 # leituira do  segundo inteiro, resultado vai para $v0
+    syscall
+
+    move $t1,$v0 # move o resultado de $v0 para $t1 (que eh o priemiro elemento da subtracao)
+
+    sub $a0, $t0, $t1 # faz a subtracao e joga o resuiltado em $s0 que eh o arguemnto da syscall do print
+
+    li $v0,1    # passa a syscall do print e chama ela
+    syscall 
+
+    li $v0,10   # encerra o processo
+    syscall
+
+    
+    

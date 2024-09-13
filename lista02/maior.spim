@@ -1,0 +1,63 @@
+.data
+br: .asciiz "\n"
+.text
+main:
+    #le o tamanho
+    li $v0,5
+    syscall
+
+    move $t0, $v0
+
+    #le o primeiro inteiro da lista considerando ele o maior
+    li $v0,5
+    syscall
+
+    move $t1,$v0
+
+    #contador
+    li $t2, 1
+
+    loop:
+
+        # condicao do loop
+        beq $t0, $t2, saida
+
+        # le o inteiro
+        li $v0,5
+        syscall
+
+        move $t3,$v0
+
+        # se for maior que o maior, ele se torna o maior
+        slt $t4, $t1, $t3
+        bne $t4, $zero , maior
+
+        j continua
+
+        maior:
+            move $t1, $t3
+
+        continua:
+            addi $t2, $t2, 1
+            j loop
+
+
+    saida:
+
+        #printa o maior
+        li $v0,1
+        move $a0, $t1
+        syscall
+
+        # printa o quebra linha
+        li $v0,4
+        la $a0, br
+        syscall
+
+        # encerra o processo
+        li $v0,10
+        syscall
+
+
+
+

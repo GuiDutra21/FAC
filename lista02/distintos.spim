@@ -1,0 +1,47 @@
+elemDistintos:
+    move $t0, $a0 # t0 = endereço base do vetor
+    move $t1, $a1 # t1 = quantidade de elementos em t0
+
+    li $t2, 0 # contador
+    li $t3, 0 # registrador auxiliar para acessar os elemento do vetor
+    li $t4, 0 # quantidade de elementos distintos
+    lw $t5, 0($t0) # contem o elemento anterior ao que está sendo analisado para compararmos
+
+    loop:
+
+        beq $t2, $t1, saida # condição de parada do loop
+
+        addi $t0, $t0, 4 # faz o apontamento para o próximo elemento
+        lw $t3, 0($t0) # passa o elemento atual para t3
+
+        bne $t3, $t5, soma # se for diferente soma
+        j continua
+
+        soma:
+            addi $t4, $t4, 1
+
+        continua:
+            move $t5, $t3 #atualiza o valor de t5 para conter o elemento anterior ao que iremos analisar
+            addi $t2, $t2,1
+            j loop
+
+    saida:
+        move $v0,$t4
+        jr $ra
+
+# .data
+#     vetor: .word 1, 1, 2, 2, 5, 5, 5, 5, 7, 8,
+
+# .text
+# main:
+#     la $a0, vetor
+#     li $a1, 10
+#     jal elemDistintos
+
+#     move $a0, $v0
+
+#     li $v0,1
+#     syscall
+
+#     li $v0,10
+#     syscall

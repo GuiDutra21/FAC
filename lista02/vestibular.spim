@@ -1,0 +1,89 @@
+.data
+    str1: .space 100
+    str2: .space 100
+    br: .asciiz "\n"
+
+.text
+    main:
+
+        #le o tamanho
+        li $v0,5
+        syscall
+
+        move $t0,$v0
+        addi $t0, $t0,1 # adiciona um por conta do \0
+
+        # le a primeira string
+        li $v0,8
+        la $a0,str1
+        move $a1, $t0
+        syscall
+
+        # Consumir o caractere de nova linha após a leitura
+        li $v0, 12
+        syscall
+        
+        # le a segunda string
+        li $v0, 8
+        la $a0,str2
+        move $a1, $t0
+        syscall
+
+        # Consumir o caractere de nova linha após a leitura
+        li $v0, 12
+        syscall
+
+        # volta o tamanho para o tamanho original dele
+        addi $t0, $t0, -1
+        
+        # salva o endereço de memória das strings
+        la $s0, str1
+        la $s1, str2
+
+        # contador
+        li $t3,0
+
+        # contador auxiliar para acessar corretamente os índices das strings
+        move $t4, $t3
+
+        # registrador que contém a resposta
+        li $t5, 0
+
+        loop:
+
+            # condicao de parada do loop
+            beq $t3, $t0, saida
+
+            # para ir acessando o próximo índice 
+            add $t7, $t3, $s0
+            add $t8, $t3, $s1
+
+            # salva o caracter das strings
+            lb $t1, 0($t7)
+            lb $t2, 0($t8)
+
+            #compara os caracteres
+            beq $t1, $t2, igual
+            j continua
+
+            igual:
+                addi $t5, $t5, 1
+            
+            continua:
+                addi $t3, $t3, 1
+                j loop
+
+        saida:
+            # printa o resultado
+            li $v0,1
+            move $a0,$t5
+            syscall
+
+            #pirnta o quebra de linha
+            li $v0,4
+            la $a0,br
+            syscall
+
+            # encerra o processo
+            li $v0, 10
+            syscall

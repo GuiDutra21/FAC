@@ -1,0 +1,49 @@
+
+.text 
+main:
+    # le o valor custo
+    li $v0,7
+    syscall
+    
+    # le a primeira porcentage
+    li $v0,5    
+    syscall
+    move $t0, $v0
+
+    # le a segunda porcentagem
+    li $v0,5
+    syscall
+    move $t1, $v0
+
+    add $t1, $t1, $t0
+    
+    # soma para facilitar o calculo 
+    addi $t1, $t1, 100
+
+    # move $a0, $t1
+    # li $v0, 1
+    # syscall
+
+    # converte as porcentagens em double
+    mtc1 $t1, $f2
+    cvt.d.w $f2, $f2
+
+    # mov.d $f12, $f2
+    # li $v0, 3
+    # syscall
+
+    # faz o calculo da porcentagem
+    mul.d $f0, $f0, $f2
+    li.d $f4, 100.0
+    div.d $f0, $f0, $f4
+
+    # imprime
+    mov.d $f12, $f0
+    li $v0, 3
+    syscall
+
+    li $v0,10
+    syscall
+
+
+

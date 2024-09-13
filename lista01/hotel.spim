@@ -1,0 +1,47 @@
+.data
+    quebraLinha: .asciiz "\n"
+.text
+main: 
+
+    # passo 1 : calcular o valor da promocao = D + (A * (N - 1))
+
+    li $v0,5    # le o primeiro inteiro (variavel D)
+    syscall
+
+    move $t0,$v0    #  $t0 = D
+
+    li $v0,5    #le o segundo inteiro (variavel A)
+    syscall
+
+    move $t1,$v0    #  $t1 = A 
+
+    li $v0,5    # le o terceiro inteiro (variavel N)
+    syscall
+
+    move $t2,$v0    # $t2 = N
+
+    addi  $s0, $t2, -1 # $s0 = N - 1
+
+
+    mul $s1, $s0, $t1 # $s1 = (A * (N - 1))
+
+    add $s1,$s1,$t0
+
+    # passo 2 : pegar o valor da promocao calculada no passo anterior e multiplicar por (31 - N + 1)
+
+    neg $s2, $t2 # $s2 = - N
+
+    addi $s2, $s2, 32   #  $s2 = 32 - N
+
+    mul $a0, $s1, $s2   # $ao = resultado que queremos
+
+    li $v0,1    # printa o resultado que queremos
+    syscall
+
+    la $a0,quebraLinha  # printa uma quebra de linha
+    li $v0,4
+    syscall
+
+
+    li $v0,10   # encerra o processo
+    syscall

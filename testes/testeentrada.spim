@@ -1,0 +1,31 @@
+.data
+    msg: .asciiz " "
+.text
+main:
+
+    la $a0,msg
+    #li $a1,4
+    li $v0,8
+    syscall
+
+    lb $t0, 0($a0)
+    lb $t1, 2($a0)
+
+    beq $t1,$t0, igual
+    j diferente
+
+    igual:
+        li $a0,1
+        li $v0,1
+        syscall
+        j termina
+
+    diferente: 
+
+        li $a0,2
+        li $v0,1
+        syscall
+
+    termina: 
+        li $v0,10
+        syscall

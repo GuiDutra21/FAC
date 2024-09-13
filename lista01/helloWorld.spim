@@ -1,0 +1,13 @@
+.data 
+
+mensagem: .asciiz "Hello World\n"
+
+.text
+main:
+
+    li $v0,4            # carrega a syscall que printa um string
+    la $a0,mensagem     # carrega a string no argumento da syscall
+    syscall             # executa syscall
+
+    li $v0,10           #carrega a syscall que encerra o processo
+    syscall

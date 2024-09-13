@@ -1,0 +1,16 @@
+contaBits:
+    move $t0, $a0 # recebe o número que vamos contar os bits 1
+    li $t2, 0 # quantidade de bits 1s
+
+
+    loop:
+        beq $t0, $zero, saida # condição de parada
+
+        andi $t3, $t0, 1 # faz a mascara para capturar o bit menos significativo
+        add $t2, $t2, $t3 # soma, pois só poderá ser 0 ou 1 e se for zero não faz diferença
+        srl $t0, $t0, 1 # anda uma a casa à direita para analisarmos o próximo bit
+        j loop
+
+    saida:
+        move $v0, $t2
+        jr $ra

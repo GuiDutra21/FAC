@@ -1,0 +1,282 @@
+.data
+br: .asciiz "\n"
+espaco: .asciiz " "
+entrada: .space 7
+label: .asciiz "\nteste"
+
+.text
+main:
+    # contador dos teste
+    li $s7, 0
+    lacoPrincipal:
+    addi $s7, $s7, 1
+    #le a quantidade de aeroportos e voos como string
+        li $v0, 8        # syscall para leitura de string
+        la $a0, entrada   # endereço da string
+        syscall
+
+        jal conversao
+
+        # inteiros retornados na função
+        move $s0, $v0 # s0 = quantidade de aeroportos
+        move $s1, $v1 # s1 = quantidade de voos
+
+        # condicao de parada do algoritmo todo, quando os dois são iguais a 0
+        or $s2, $s0, $s1
+        beq $s2, $zero, saida
+
+        # alocacao dinamica do vetor
+        sll $t3, $s0, 2
+        move $a0, $t3
+        li $v0,9
+        syscall
+
+        move $s5, $v0 # s5 = endereco do vetor
+        move $t9, $v0
+
+        # contador do lacoVoos
+        li $t3, 0
+
+        lacoVoos:
+            
+            beq $t3, $s1, impressao
+
+            li $v0, 8        # syscall para leitura de string
+            la $a0, entrada   # endereço da string
+            syscall
+
+            jal conversao
+
+            move $s3 ,$v0 # s3 aeroporto de saida
+            move $s4 ,$v1 # s4 aeroporto de destino
+
+            addi $s3, $s3, -1
+            addi $s4, $s4, -1
+
+            # para o aeroporto de saida: 
+
+            # t4 vai ser o registrador que eu vou usar para acessar os indices do vetor
+            li $t4, 0
+            sll $t4, $s3, 2 # coloca em bytes o indice
+
+            # t5 vai conter uma copia do endereco do registrador para nao alterar o endereco do registrador original
+            move $t5, $s5
+
+            add $t5, $t5, $t4 # aponta para a regiao que eu quero
+
+            # t6 vai receber o valor da posicao que desejamos alterar
+            lw $t6, 0($t5)
+
+            addi $t6,1 # soma um na posicao
+
+            # passa o valor incrementado para a posicao dele
+            sw $t6, 0($t5)
+
+            # para o aeroporto de chegada:
+
+            # t4 vai ser o registrador que eu vou usar para acessar os indices do vetor
+            li $t4, 0
+            sll $t4, $s4, 2 # coloca em bytes o indice
+
+            # t5 vai conter uma copia do endereco do registrador para nao alterar o endereco do registrador original
+            move $t5, $s5
+
+            add $t5, $t5, $t4 # aponta para a regiao que eu quero
+
+            # t6 vai receber o valor da posicao que desejamos alterar
+            lw $t6, 0($t5)
+            
+            addi $t6, 1 # soma um na posicao
+
+            # passa o valor incrementado para a posicao dele
+            sw $t6, 0($t5)
+
+            addi $t3, $t3, 1
+
+        j lacoVoos
+
+
+        # descobre quem eh o maior
+        impressao:
+
+            li $v0,4 # printa a palavra teste
+            la $a0, label
+            syscall
+
+            li $v0,4 # printa o espaco
+            la $a0, espaco
+            syscall
+
+            li $v0,1 # printa o numero do teste
+            move $a0, $s7
+            syscall
+
+            li $v0,4 # printa o quebra linha
+            la $a0, br
+            syscall
+
+
+            # contador
+            li $t3, 0
+
+            # t5 vai conter uma copia do endereco do registrador para nao alterar o endereco do registrador original
+            move $t5, $s5
+
+            # $t4 vai guardar o maior valor
+            li $t4, 0
+
+            maior:
+                beq $t3, $s0, imprimir
+
+                lw $t6 , 0($t5) # contem o elemento atual
+                slt $t7, $t4, $t6 
+
+                # caso o maior seje menor que o elementoa atual o atual vira o maior
+                bne $t7, $zero, alteraMaior
+                j incrementa
+
+                alteraMaior:
+                        move $t4, $t6
+
+                incrementa:
+                        addi $t5, $t5, 4 # faz o vetor apontar para a proxima posicao
+                        addi $t3, $t3, 1 # incrementa o contador
+                        j maior
+            
+            imprimir:
+                # t5 vai conter uma copia do endereco do registrador para nao alterar o endereco do registrador original
+                move $t5, $s5
+
+                # contador
+                li $t3, 0
+                lacoImpressao:
+                        beq $t3, $s0, barraN
+                        j prosseguir
+
+                        barraN:
+                            li $v0,4 # printa o quebra de linha
+                            la $a0, br
+                            syscall
+
+                        prosseguir:
+                            beq $t3, $s0, lacoPrincipal
+
+                        lw $t6, 0($t5) # contem o elemento atual
+                        beq $t6, $t4, printa # se for igual ao atual printa o indice
+                        j incrementa2
+
+                        printa:
+                            li $v0,1 # printa o indice
+                            addi $t3, $t3, 1 # soma para ajustar a impressao, pois a questao considera o primeiro indice como 1
+                            move $a0,$t3
+                            syscall # para nao alterar depois   
+                            addi $t3, $t3, -1
+
+                            li $v0,4 # printa o espaco
+                            la $a0, espaco
+                            syscall
+                            
+                        incrementa2:
+                                addi $t3, $t3, 1 # soma o contador e faz o vetor apontar para a proxima posicao
+                                addi $t5, $t5, 4
+                                j lacoImpressao
+            
+
+# fim do algoritmo      
+saida:
+    li $v0,10
+    syscall
+
+# Procedimento para retornar os inteiros lidos na string
+conversao:
+
+    # Registrador que conterá o primeiro número
+    li $t0, 0
+
+    primeiroNumero:
+        # Recebe o caractere atual
+        lb $t1, 0($a0)
+
+        # Verifica se é um espaço (fim da conversão)
+        beq $t1, 32, segundoNumero
+
+        # Multiplica o resultado por 10
+        mul $t0, $t0, 10
+
+        # Converte o caractere para inteiro
+        addi $t1, $t1, -48   # Subtrai o valor ASCII de '0'
+        add $t0, $t0, $t1    # Soma o novo dígito
+        addi $a0, $a0, 1      # Avança para o próximo caractere
+        j primeiroNumero
+
+    segundoNumero:
+
+        addi $a0, $a0, 1      # Avança para o próximo caractere
+
+        # Registrador que conterá o segundo número
+        li $t1, 0
+
+        laco2:
+            # Recebe o caractere atual
+            lb $t2, 0($a0)
+
+            # Verifica se é uma quebra de linha (fim da conversão)
+            beq $t2, 10, retornoFuncao
+
+            # Multiplica o resultado por 10
+            mul $t1, $t1, 10
+
+            # Converte o caractere para inteiro
+            addi $t2, $t2, -48   # Subtrai o valor ASCII de '0'
+            add $t1, $t1, $t2    # Soma o novo dígito
+            addi $a0, $a0, 1      # Avança para o próximo caractere
+            j laco2
+
+    retornoFuncao:
+        move $v0, $t0
+        move $v1, $t1
+        jr $ra
+
+
+
+
+        # li $v0,4 # printa o espaco
+        #     la $a0, espaco
+        #     syscall
+
+        #     li $v0, 1
+        #     move $a0, $t3
+        #     syscall
+
+        #     li $v0,4 # printa o espaco
+        #     la $a0, espaco
+        #     syscall
+
+        #     li $v0, 1
+        #     move $a0, $s1
+        #     syscall
+
+        #     li $v0,4 # printa o espaco
+        #     la $a0, br
+        #     syscall      
+
+        # # contador
+            #     li $t8, 0
+            #     teste:    
+            #         beq $t8, $s0, continua
+            #         lw $s6, 0($t9) # contem o elemento atual
+
+            #         move $a0, $s6
+            #         li $v0, 1
+            #         syscall
+
+            #         addi $t9, $t9, 4
+            #         addi $t8, $t8, 1
+            #         j teste
+            # continua:
+
+            # li $v0,4 # printa o espaco
+            # la $a0, br
+            # syscall
+
+            

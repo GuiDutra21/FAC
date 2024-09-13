@@ -1,0 +1,28 @@
+.text
+
+    deslocaDir:
+        andi $a0, $a0, 1 # pega o bit menos significativo
+        sll $a0,$a0,31  # deslsoca ele para a posicao mais significativa
+        or $v0,$a1,$a0  # faz o or para passar o bit para o segundo registrador
+        jr $ra
+
+main:
+    
+    li $t0,1 # registrador da esquerda
+    li $t1,2 # resgistrador da direita
+
+    srl $t1,$t1,1 # descola a direita o segundo registrador
+
+    move $a0,$t0 # carrega os parametros
+    move $a1, $t1
+
+    jal deslocaDir  # chama o procedimento
+
+    srl $t0, $t0,1 # desloca a direita o primeiro registrador
+
+    move $a0,$v0  # printa o resgistrador da direita : -2147483647 = -(2)^31 - 1
+    li $v0,1
+    syscall
+
+    li $v0,10   #encerra o processo
+    syscall
